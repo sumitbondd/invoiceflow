@@ -1,0 +1,3 @@
+pip install streamlit google-generativeai Pillow PyMuPDF pandas
+# For pdf2image, you might also need poppler (OS-dependent installation)
+pip install pdf2image

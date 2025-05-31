@@ -8,7 +8,7 @@ import pandas as pd
 import csv # For more robust CSV parsing/generation if needed
 
 # --- Configuration ---
-st.set_page_config(layout="wide", page_title="Document Data Extractor")
+st.set_page_config(layout="wide", page_title="Document Data Extractor By Sumit Yadav")
 
 # --- Helper Functions ---
 

@@ -8,7 +8,7 @@ import pandas as pd
 import csv # For more robust CSV parsing/generation if needed
 
 # --- Configuration ---
-st.set_page_config(layout="wide", page_title="Document Data Extractor By Sumit Yadav")
+st.set_page_config(layout="wide", page_title="Data Extrtr By Sumit Yadav")
 
 # --- Helper Functions ---
 
@@ -127,7 +127,7 @@ def parse_llm_response_to_df(response_text, headers_from_prompt):
 
 
 # --- Streamlit App UI ---
-st.title("📄 Document Data Extractor with Gemini 1.5 Pro 🤖")
+st.title("📄 Document Data Extractor by Sumit Yadav🤖")
 st.markdown("Upload a PDF or Image, specify the fields to extract, and let Gemini do the work!")
 
 # --- API Key Input ---

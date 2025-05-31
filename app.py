@@ -6,6 +6,11 @@ import fitz  # PyMuPDF (for PDF text and image extraction)
 import io
 import pandas as pd
 import csv # For more robust CSV parsing/generation if needed
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # --- Configuration ---
 st.set_page_config(layout="wide", page_title="Data Extrtr By Sumit Yadav")
@@ -13,8 +18,13 @@ st.set_page_config(layout="wide", page_title="Data Extrtr By Sumit Yadav")
 # --- Helper Functions ---
 
 def get_gemini_api_key():
-    """Gets Gemini API key from Streamlit secrets or user input."""
-    # Try to get from Streamlit secrets first (for deployed apps)
+    """Gets Gemini API key from .env file, Streamlit secrets, or user input."""
+    # First try to get from .env file
+    api_key = os.getenv("GEMINI_API_KEY")
+    if api_key:
+        return api_key
+    
+    # Try to get from Streamlit secrets (for deployed apps)
     try:
         return st.secrets["GEMINI_API_KEY"]
     except (FileNotFoundError, KeyError):
@@ -22,6 +32,7 @@ def get_gemini_api_key():
         api_key = st.sidebar.text_input("Enter your Gemini API Key:", type="password", key="api_key_input")
         if not api_key:
             st.sidebar.warning("Please enter your Gemini API Key to proceed.")
+            st.sidebar.info("💡 **Tip:** Create a `.env` file in your project directory with `GEMINI_API_KEY=your_api_key_here` to avoid entering it each time.")
             st.stop()
         return api_key
 
@@ -132,6 +143,12 @@ st.markdown("Upload a PDF or Image, specify the fields to extract, and let Gemin
 
 # --- API Key Input ---
 API_KEY = get_gemini_api_key() # Ensure API key is available
+
+# Show API key status
+if os.getenv("GEMINI_API_KEY"):
+    st.sidebar.success("✅ API Key loaded from .env file")
+elif API_KEY:
+    st.sidebar.info("🔑 API Key entered manually")
 
 # --- User Inputs ---
 uploaded_file = st.file_uploader("1. Upload a PDF or Image file", type=["pdf", "png", "jpg", "jpeg"])
@@ -279,7 +296,7 @@ if st.button("🚀 Extract Data", type="primary") and uploaded_file and API_KEY 
 st.sidebar.title("💡 How to Use")
 st.sidebar.info(
     """
-    1.  Enter your Gemini API Key.
+    1.  Create a `.env` file with your API key or enter it manually.
     2.  Upload a PDF or image file containing the data.
     3.  Verify or customize the 'Fields to extract'. These will be your table headers.
     4.  If uploading a PDF, choose a processing method. 'text_and_image_per_page' is often best for mixed or scanned PDFs.
@@ -287,6 +304,21 @@ st.sidebar.info(
     6.  Review the raw and parsed output. Download as CSV or TXT.
     """
 )
+
+st.sidebar.title("🔐 API Key Setup")
+st.sidebar.info(
+    """
+    **Option 1 (Recommended):** Create a `.env` file in your project directory:
+    ```
+    GEMINI_API_KEY=your_api_key_here
+    ```
+    
+    **Option 2:** For deployed apps, use Streamlit Secrets.
+    
+    **Option 3:** Enter manually in the sidebar (not recommended for production).
+    """
+)
+
 st.sidebar.title("⚠️ Important Notes")
 st.sidebar.warning(
     """
@@ -294,6 +326,6 @@ st.sidebar.warning(
     -   **Prompting:** The quality of extraction heavily depends on the clarity of the 'Fields to extract' and the internal prompt structure.
     -   **Complex Layouts:** Very complex tables or layouts might be challenging. Gemini 1.5 Pro is good, but not infallible.
     -   **Token Limits & Cost:** Processing large PDFs (especially page-by-page as images) consumes more tokens and may incur higher API costs.
-    -   **API Key Security:** For deployed apps, use Streamlit Secrets to store your API key. Do not hardcode it.
+    -   **API Key Security:** Never commit your `.env` file to version control. Add it to `.gitignore`.
     """
 )
